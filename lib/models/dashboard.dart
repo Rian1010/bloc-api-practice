@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 // import 'package:administration_app/dashboard/repositories/dashboard_repository.dart';
 // import 'package:equatable/equatable.dart';
@@ -33,12 +34,6 @@ class DashboardStats with ChangeNotifier {
       newUsers: 2,
       usersActivePerDay: 3,
     ),
-    Dashboard(
-      id: "2",
-      newUsersToday: 4,
-      newUsers: 5,
-      usersActivePerDay: 6,
-    ),
   ];
 
   List<Dashboard> get stats {
@@ -47,30 +42,37 @@ class DashboardStats with ChangeNotifier {
 
   Future<List<Dashboard>> fetchStats(String from, String to) async {
     final rawUserData = Uri.parse(
-        'https://test.ouslygroup.com/api/admin/stats/users/new/2021-11-01/2021-11-17');
-    final response = await http.get(rawUserData);
-    final extractedData = json.decode(response.body) as Map<String, dynamic>;
-
-    if (response.statusCode != 200) {
-      throw Exception();
+        'https://test.ouslygroup.com/api/admin/stats/users/new/2021-11-01/2021-11-20');
+    try {
+      final response = await http.get(rawUserData, headers: {
+        HttpHeaders.authorizationHeader: 'someToken',
+      });
+      print(json.decode(response.body));
+    } catch (error) {
+      throw (error);
     }
+    // final extractedData = json.decode(response.body) as Map<String, dynamic>;
 
-    final List<Dashboard> loadedUserInfo = [];
-    print(extractedData);
+    // if (response.statusCode != 200) {
+    //   throw Exception();
+    // }
 
-    extractedData.forEach((userId, userData) {
-      loadedUserInfo.add(
-        Dashboard(
-          id: userId,
-          newUsersToday: userData['sumToday'],
-          newUsers: userData['sumPeriod'],
-          usersActivePerDay: userData['activeUsers'],
-        ),
-      );
-    });
-    print('here: ${extractedData}');
-    _stats = loadedUserInfo;
-    notifyListeners();
+    // final List<Dashboard> loadedUserInfo = [];
+    // print(extractedData);
+
+    // extractedData.forEach((userId, userData) {
+    //   loadedUserInfo.add(
+    //     Dashboard(
+    //       id: userId,
+    //       newUsersToday: userData['sumToday'],
+    //       newUsers: userData['sumPeriod'],
+    //       usersActivePerDay: userData['activeUsers'],
+    //     ),
+    //   );
+    // });
+    // print('here: ${extractedData}');
+    // _stats = loadedUserInfo;
+    // notifyListeners();
 
     return _stats;
   }
